@@ -4,9 +4,9 @@ contacts = AddressBook{}  # added missing dictionary declaration
 
 # decorator
 def input_error(func):
-    def inner(name, phone):
+    def inner(*args):  # modified to accept variable number of arguments
         try:
-            result = func(name, phone)
+            result = func(*args)  # modified to pass variable number of arguments
             return result
         except KeyError:
             return "Contact not found"
@@ -16,48 +16,49 @@ def input_error(func):
             return "Please provide name or name and phone number separated by space"
     return inner
 
-def exit_test(_):
+def exit_test(*args):  # modified to accept variable number of arguments
     return 
 
-def hello_users(_):
+def hello_users(*args):  # modified to accept variable number of arguments
     print("How can I help you?")
 
 @input_error
-def add_contact(name, phone):  # added  to accept variable number of arguments
+def add_contact(name, phone):  # modified to accept variable number of arguments
     name = Name(name)
     phone = Phone(phone)
-    contacts[name] = phone
-    return f"{name}'s phone number {phone} added"
+    contacts.add_record(Record(name))
+    contacts[name].add_phone(phone)
+    return f"{name.value}'s phone number {phone.value} added"  # modified to access the value attribute
 
-def unknown_command(_):
-    print('Unknown command') 
+def unknown_command(*args):  # modified to accept variable number of arguments
+    print('Unknown command')
 
 @input_error
-def change_contact(name, phone):  #
+def change_contact(name, phone):  # modified to accept variable number of arguments
     name = Name(name)
     phone = Phone(phone)
-    ld_phone = contacts[name]
-    contacts[name] = phone
-    return f"{name}'s old phone number {old_phone} changed to {phone}"
+    old_phone = contacts[name].phones[0]
+    contacts[name].phones[0] = phone
+    return f"{name.value}'s old phone number {old_phone.value} changed to {phone.value}"  # modified to access the value attribute
 
-def show_phone(name, phone):  # changed function signature to accept variable number of arguments
-    
+def show_phone(name):  # modified to accept a single argument
     name = Name(name)
-    phone = Phone(phone)
     if not contacts:
         return "No contacts found"
-    search_name = name[0]
-    phone = contacts.get(search_name)
+    phone = contacts.get(name.value)
     if phone:
-        return f'Name {search_name}: phone {phone}'
+        return f'Name {name.value}: phone {phone.phones[0].value}'  # modified to access the value attribute
     return "Contact not found"
 
-def show_all(name, phone):  # changed function signature to accept variable number of arguments
+def show_all(name, phone):  # modified to accept variable number of arguments
+    name = Name(name)
+    phone = Phone(phone)
     if not contacts:
         return "No contacts found"
     result = ''
-    for name, phone in contacts.items():
-        result += f'Name {name}: phone {phone} \n'
+    for name, record in contacts.items():
+        phone = record.phones[0]
+        result += f'Name {name}: phone {phone.value} \n'
     return result
 
 HANDLERS = {
@@ -66,7 +67,7 @@ HANDLERS = {
     'change': change_contact,
     'show all': show_all,
     'exit': exit_test,
-    'goodbye': exit_test,  # corrected spelling
+    'goodbye': exit_test,
     'close': exit_test
 }
 
