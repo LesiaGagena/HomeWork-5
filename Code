@@ -34,11 +34,16 @@ def unknown_command(_):
 
 @input_error
 def change_contact(name, phone):  #
-    old_phone = contacts[name]
+    name = Name(name)
+    phone = Phone(phone)
+    ld_phone = contacts[name]
     contacts[name] = phone
     return f"{name}'s old phone number {old_phone} changed to {phone}"
 
 def show_phone(name, phone):  # changed function signature to accept variable number of arguments
+    
+    name = Name(name)
+    phone = Phone(phone)
     if not contacts:
         return "No contacts found"
     search_name = name[0]
